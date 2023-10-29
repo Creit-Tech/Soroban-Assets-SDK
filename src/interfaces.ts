@@ -66,7 +66,7 @@ export interface SorobanAssetsSDKParams {
   simulationAccount: address;
   contractId: address;
   defaultFee: string;
-  rpc: string;
+  rpcUrl: string;
   allowHttp?: boolean;
   network: Networks;
 }
