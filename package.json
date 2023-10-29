@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "build": "npx tsc -p .",
+    "build:docs": "npx typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "test": "jest"
   },
   "author": "Creit Technologies LLP",
@@ -28,6 +29,8 @@
     "stellar-sdk": "^10.4.1",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
+    "typedoc": "^0.25.2",
+    "typedoc-plugin-markdown": "^3.16.0",
     "typescript": "^4.9.5"
   },
   "dependencies": {

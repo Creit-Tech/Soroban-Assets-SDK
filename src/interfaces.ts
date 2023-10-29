@@ -1,18 +1,8 @@
 import { Memo, Networks, SorobanRpc } from 'soroban-client';
 
 export type u32 = number;
-export type i32 = number;
-export type u64 = bigint;
-export type i64 = bigint;
-export type u128 = bigint;
 export type i128 = bigint;
-export type u256 = bigint;
-export type i256 = bigint;
-export type Option<T> = T | undefined;
-export type Typepoint = bigint;
-export type Duration = bigint;
 export type address = string;
-export type SymbolType = string;
 
 export interface AllowanceDataKey {
   from: address;
