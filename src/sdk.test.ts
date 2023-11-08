@@ -1,5 +1,5 @@
 import { SorobanAssetsSDK } from './sdk';
-import { Account, Asset, Keypair, Networks, Server, Transaction } from 'soroban-client';
+import { Account, Address, Asset, hash, Keypair, Networks, Server, Transaction, xdr } from 'soroban-client';
 import { randomBytes } from 'node:crypto';
 import * as StellarSdk from 'stellar-sdk';
 import { SorobanRpc } from 'soroban-client/lib/soroban_rpc';
@@ -24,6 +24,19 @@ async function waitUntilTxApproved(server: Server, result: SorobanRpc.SendTransa
       throw new Error(`Transaction ${hash} failed.`);
     }
   }
+}
+
+async function getExpirationLedger(server: Server, ledgerKey: xdr.LedgerKey) {
+  let keyHash: Buffer = hash(ledgerKey.toXDR());
+  const expirationKey: xdr.LedgerKey = xdr.LedgerKey.expiration(new xdr.LedgerKeyExpiration({ keyHash }));
+
+  const data: SorobanRpc.GetLedgerEntriesResponse = await server.getLedgerEntries(expirationKey);
+
+  if (!data.entries) {
+    throw new Error(`Entry doesn't exist`);
+  }
+
+  return (data.entries[0].val.value() as any).expirationLedgerSeq();
 }
 
 /**
@@ -301,6 +314,38 @@ describe('SorobanAssetsSDK Tests', () => {
       expect(decimals).toEqual(7);
       expect(name).toEqual('native');
       expect(symbol).toEqual('native');
+    }, 20000);
+
+    test('Bumping contract instance', async () => {
+      const ledgersToExpire: number = 1500000;
+      const contractId: string = SorobanAssetsSDK.generateStellarAssetContractId({
+        asset,
+        network,
+      });
+      const address: Address = new Address(contractId);
+
+      const instanceLedgerKey: xdr.LedgerKey = xdr.LedgerKey.contractData(
+        new xdr.LedgerKeyContractData({
+          contract: address.toScAddress(),
+          key: xdr.ScVal.scvLedgerKeyContractInstance(),
+          durability: xdr.ContractDataDurability.persistent(),
+        })
+      );
+
+      const currentExpirationLedger = await getExpirationLedger(rpc, instanceLedgerKey);
+
+      const { preparedTransactionXDR } = await assetSDK.bumpContractInstance({
+        sourceAccount: fromKeypair.publicKey(),
+        ledgersToExpire,
+      });
+
+      const tx = new Transaction(preparedTransactionXDR, network);
+      tx.sign(fromKeypair);
+      const result = await rpc.sendTransaction(tx);
+      await waitUntilTxApproved(rpc, result);
+
+      const updatedExpirationLedger = await getExpirationLedger(rpc, instanceLedgerKey);
+      expect(updatedExpirationLedger).toBeGreaterThan(currentExpirationLedger);
     }, 20000);
   });
 

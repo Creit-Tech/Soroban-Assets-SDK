@@ -24,6 +24,7 @@ import {
   SorobanDataBuilder,
   SorobanRpc,
   StrKey,
+  Transaction,
   TransactionBuilder,
   xdr,
 } from 'soroban-client';
@@ -458,5 +459,121 @@ export class SorobanAssetsSDK {
       server: this.server,
       scVals: [from, amount],
     });
+  }
+
+  async bumpContractInstance(
+    params: DefaultRequestParams<{ ledgersToExpire: number }>
+  ): Promise<DefaultContractTransactionGenerationResponse> {
+    const address = Address.fromString(this.globalParams.contractId);
+
+    const instanceLedgerKey: xdr.LedgerKey = xdr.LedgerKey.contractData(
+      new xdr.LedgerKeyContractData({
+        contract: address.toScAddress(),
+        key: xdr.ScVal.scvLedgerKeyContractInstance(),
+        durability: xdr.ContractDataDurability.persistent(),
+      })
+    );
+
+    const txData: xdr.SorobanTransactionData = new xdr.SorobanTransactionData({
+      resources: new xdr.SorobanResources({
+        footprint: new xdr.LedgerFootprint({
+          readOnly: [instanceLedgerKey],
+          readWrite: [],
+        }),
+        instructions: 0,
+        readBytes: 0,
+        writeBytes: 0,
+      }),
+      refundableFee: xdr.Int64.fromString('0'),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      ext: new xdr.ExtensionPoint(0),
+    });
+
+    const source: Account = await this.server.getAccount(params.sourceAccount);
+    const tx: Transaction = new TransactionBuilder(source, {
+      fee: this.globalParams.defaultFee,
+      networkPassphrase: this.globalParams.network,
+      memo: params.memo,
+    })
+      .setTimeout(params.timeout || 0)
+      .addOperation(Operation.bumpFootprintExpiration({ ledgersToExpire: params.ledgersToExpire }))
+      .setSorobanData(txData)
+      .build();
+
+    const simulated = await this.server.simulateTransaction(tx);
+
+    if (isSimulationError(simulated)) {
+      throw new Error(simulated.error);
+    }
+
+    const prepared = assembleTransaction(tx, this.globalParams.network, simulated).build();
+
+    return { transactionXDR: tx.toXDR(), simulated, preparedTransactionXDR: prepared.toXDR() };
+  }
+
+  // TODO: We need to create a test for this method
+  async bumpContractCode(
+    params: DefaultRequestParams<{ ledgersToExpire: number }>
+  ): Promise<DefaultContractTransactionGenerationResponse> {
+    const instanceKey: xdr.LedgerKey = xdr.LedgerKey.contractData(
+      new xdr.LedgerKeyContractData({
+        contract: new Address(this.globalParams.contractId).toScAddress(),
+        key: xdr.ScVal.scvLedgerKeyContractInstance(),
+        durability: xdr.ContractDataDurability.persistent(),
+      })
+    );
+
+    const response2: SorobanRpc.GetLedgerEntriesResponse = await this.server.getLedgerEntries(instanceKey);
+    const dataEntry: xdr.ContractDataEntry = response2.entries[0].val.contractData();
+
+    const instance: xdr.ScContractInstance = dataEntry.val().instance();
+
+    if (!instance.executable().wasmHash()) {
+      throw new Error(`There is no wasm hash. This is common if this asset is a wrapped asset.`);
+    }
+
+    const ledgerKey: xdr.LedgerKey = xdr.LedgerKey.contractCode(
+      new xdr.LedgerKeyContractCode({
+        hash: instance.executable().wasmHash(),
+      })
+    );
+
+    const txData = new xdr.SorobanTransactionData({
+      resources: new xdr.SorobanResources({
+        footprint: new xdr.LedgerFootprint({
+          readOnly: [ledgerKey],
+          readWrite: [],
+        }),
+        instructions: 0,
+        readBytes: 0,
+        writeBytes: 0,
+      }),
+      refundableFee: xdr.Int64.fromString('0'),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      ext: new xdr.ExtensionPoint(0),
+    });
+
+    const source: Account = await this.server.getAccount(params.sourceAccount);
+    const tx: Transaction = new TransactionBuilder(source, {
+      fee: this.globalParams.defaultFee,
+      networkPassphrase: this.globalParams.network,
+      memo: params.memo,
+    })
+      .setTimeout(params.timeout || 0)
+      .addOperation(Operation.bumpFootprintExpiration({ ledgersToExpire: params.ledgersToExpire }))
+      .setSorobanData(txData)
+      .build();
+
+    const simulated = await this.server.simulateTransaction(tx);
+
+    if (isSimulationError(simulated)) {
+      throw new Error(simulated.error);
+    }
+
+    const prepared = assembleTransaction(tx, this.globalParams.network, simulated).build();
+
+    return { transactionXDR: tx.toXDR(), simulated, preparedTransactionXDR: prepared.toXDR() };
   }
 }
