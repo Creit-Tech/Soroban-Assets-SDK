@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[interfaces.ts:60](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L60)
+[interfaces.ts:60](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L60)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:57](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L57)
+[interfaces.ts:57](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L57)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:58](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L58)
+[interfaces.ts:58](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L58)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:61](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L61)
+[interfaces.ts:61](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L61)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:59](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L59)
+[interfaces.ts:59](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L59)
 
 ___
 
@@ -74,4 +74,4 @@ You don't need to own this account, but it must be an existing account on the ne
 
 #### Defined in
 
-[interfaces.ts:56](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L56)
+[interfaces.ts:56](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L56)

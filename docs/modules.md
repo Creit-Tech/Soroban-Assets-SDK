@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[interfaces.ts:23](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L23)
+[interfaces.ts:23](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L23)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:26](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L26)
+[interfaces.ts:26](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L26)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:64](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L64)
+[interfaces.ts:64](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L64)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:24](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L24)
+[interfaces.ts:24](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L24)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:5](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L5)
+[interfaces.ts:5](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L5)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:4](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L4)
+[interfaces.ts:4](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L4)
 
 ___
 
@@ -110,4 +110,4 @@ ___
 
 #### Defined in
 
-[interfaces.ts:3](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L3)
+[interfaces.ts:3](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L3)

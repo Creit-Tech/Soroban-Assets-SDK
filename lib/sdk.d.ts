@@ -73,5 +73,11 @@ export declare class SorobanAssetsSDK {
         from: address;
         amount: i128;
     }>): Promise<DefaultContractTransactionGenerationResponse>;
+    bumpContractInstance(params: DefaultRequestParams<{
+        ledgersToExpire: number;
+    }>): Promise<DefaultContractTransactionGenerationResponse>;
+    bumpContractCode(params: DefaultRequestParams<{
+        ledgersToExpire: number;
+    }>): Promise<DefaultContractTransactionGenerationResponse>;
 }
 //# sourceMappingURL=sdk.d.ts.map

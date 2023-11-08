@@ -17,7 +17,7 @@
 
 #### Defined in
 
-[interfaces.ts:8](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L8)
+[interfaces.ts:8](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L8)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 #### Defined in
 
-[interfaces.ts:9](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/401c5fb/src/interfaces.ts#L9)
+[interfaces.ts:9](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L9)
