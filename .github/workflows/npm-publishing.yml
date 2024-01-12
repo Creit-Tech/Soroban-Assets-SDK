@@ -17,6 +17,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npm i --no-save @stellar/stellar-sdk@11.2.0
+
       - run: npm run build
 
       - run: npm publish
