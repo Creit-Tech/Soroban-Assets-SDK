@@ -1,10 +1,22 @@
 import { SorobanAssetsSDK } from './sdk';
-import { Account, Address, Asset, hash, Keypair, Networks, Server, Transaction, xdr } from 'soroban-client';
+import {
+  Account,
+  Address,
+  Asset,
+  AuthClawbackEnabledFlag,
+  AuthRevocableFlag,
+  Keypair,
+  Networks,
+  Operation,
+  Transaction,
+  TransactionBuilder,
+  xdr,
+} from '@stellar/stellar-sdk';
+import { Server as SorobanServer, Api } from '@stellar/stellar-sdk/lib/soroban';
+import { Server as HorizonServer } from '@stellar/stellar-sdk/lib/horizon';
 import { randomBytes } from 'node:crypto';
-import * as StellarSdk from 'stellar-sdk';
-import { SorobanRpc } from 'soroban-client/lib/soroban_rpc';
 
-async function waitUntilTxApproved(server: Server, result: SorobanRpc.SendTransactionResponse) {
+async function waitUntilTxApproved(server: SorobanServer, result: Api.SendTransactionResponse) {
   if (result.status === 'ERROR') {
     console.error(result.errorResult?.toXDR('base64'));
     throw new Error('Sending the transaction failed');
@@ -26,17 +38,14 @@ async function waitUntilTxApproved(server: Server, result: SorobanRpc.SendTransa
   }
 }
 
-async function getExpirationLedger(server: Server, ledgerKey: xdr.LedgerKey) {
-  let keyHash: Buffer = hash(ledgerKey.toXDR());
-  const expirationKey: xdr.LedgerKey = xdr.LedgerKey.expiration(new xdr.LedgerKeyExpiration({ keyHash }));
-
-  const data: SorobanRpc.GetLedgerEntriesResponse = await server.getLedgerEntries(expirationKey);
+async function getExpirationLedger(server: SorobanServer, ledgerKey: xdr.LedgerKey) {
+  const data: Api.GetLedgerEntriesResponse = await server.getLedgerEntries(ledgerKey);
 
   if (!data.entries) {
     throw new Error(`Entry doesn't exist`);
   }
 
-  return (data.entries[0].val.value() as any).expirationLedgerSeq();
+  return data.entries[0].liveUntilLedgerSeq;
 }
 
 /**
@@ -48,8 +57,8 @@ describe('SorobanAssetsSDK Tests', () => {
   const asset: Asset = new Asset(randomBytes(3).toString('hex'), assetIssuerKeypair.publicKey());
   const horizonUrl = 'http://localhost:8000';
   const rpcUrl = 'http://localhost:8000/soroban/rpc';
-  const horizon: StellarSdk.Server = new StellarSdk.Server(horizonUrl, { allowHttp: true });
-  const rpc: Server = new Server(rpcUrl, { allowHttp: true });
+  const horizon: HorizonServer = new HorizonServer(horizonUrl, { allowHttp: true });
+  const rpc: SorobanServer = new SorobanServer(rpcUrl, { allowHttp: true });
   const network = Networks.STANDALONE;
   const simulationAccountKeypair: Keypair = Keypair.random();
   const defaultFee = '10000000';
@@ -99,25 +108,25 @@ describe('SorobanAssetsSDK Tests', () => {
     await rpc.requestAirdrop(toKeypair.publicKey());
 
     assetIssuer.incrementSequenceNumber();
-    const stellarTxBuilder = new StellarSdk.TransactionBuilder(assetIssuer, {
+    const stellarTxBuilder = new TransactionBuilder(assetIssuer, {
       networkPassphrase: network,
       fee: defaultFee,
     })
       .setTimeout(0)
-      .addOperation(StellarSdk.Operation.setOptions({ setFlags: StellarSdk.AuthRevocableFlag }))
-      .addOperation(StellarSdk.Operation.setOptions({ setFlags: StellarSdk.AuthClawbackEnabledFlag }));
+      .addOperation(Operation.setOptions({ setFlags: AuthRevocableFlag }))
+      .addOperation(Operation.setOptions({ setFlags: AuthClawbackEnabledFlag }));
 
     [spenderKeypair.publicKey(), fromKeypair.publicKey(), toKeypair.publicKey()].forEach(destination => {
       stellarTxBuilder
         .addOperation(
-          StellarSdk.Operation.changeTrust({
-            asset: new StellarSdk.Asset(asset.code, asset.issuer),
+          Operation.changeTrust({
+            asset: new Asset(asset.code, asset.issuer),
             source: destination,
           })
         )
         .addOperation(
-          StellarSdk.Operation.payment({
-            asset: new StellarSdk.Asset(asset.code, asset.issuer),
+          Operation.payment({
+            asset: new Asset(asset.code, asset.issuer),
             amount: initialIssuance,
             destination,
           })
@@ -125,10 +134,10 @@ describe('SorobanAssetsSDK Tests', () => {
     });
 
     const stellarTx = stellarTxBuilder.build();
-    stellarTx.sign(StellarSdk.Keypair.fromSecret(assetIssuerKeypair.secret()));
-    stellarTx.sign(StellarSdk.Keypair.fromSecret(spenderKeypair.secret()));
-    stellarTx.sign(StellarSdk.Keypair.fromSecret(fromKeypair.secret()));
-    stellarTx.sign(StellarSdk.Keypair.fromSecret(toKeypair.secret()));
+    stellarTx.sign(Keypair.fromSecret(assetIssuerKeypair.secret()));
+    stellarTx.sign(Keypair.fromSecret(spenderKeypair.secret()));
+    stellarTx.sign(Keypair.fromSecret(fromKeypair.secret()));
+    stellarTx.sign(Keypair.fromSecret(toKeypair.secret()));
 
     await horizon.submitTransaction(stellarTx);
   }, 60000);
@@ -214,17 +223,6 @@ describe('SorobanAssetsSDK Tests', () => {
 
       expect(updatedFromBalance).toBe(fromBalance - amount);
       expect(updatedToBalance).toBe(toBalance + amount / 2n);
-    }, 20000);
-
-    test('Get account balance and spendable balance', async () => {
-      const keypair: Keypair = Keypair.random();
-      const account: Account = await rpc.requestAirdrop(keypair.publicKey());
-
-      const balance: bigint = await nativeAsset.getBalance(account.accountId());
-      expect(balance).toBe(100000000000n);
-
-      const spendableBalance: bigint = await nativeAsset.getSpendableBalance(account.accountId());
-      expect(spendableBalance).toBe(99990000000n);
     }, 20000);
 
     test('Transfer funds between accounts', async () => {
@@ -345,7 +343,7 @@ describe('SorobanAssetsSDK Tests', () => {
       await waitUntilTxApproved(rpc, result);
 
       const updatedExpirationLedger = await getExpirationLedger(rpc, instanceLedgerKey);
-      expect(updatedExpirationLedger).toBeGreaterThan(currentExpirationLedger);
+      expect(updatedExpirationLedger).toBeGreaterThan(BigInt(currentExpirationLedger || 0));
     }, 20000);
   });
 

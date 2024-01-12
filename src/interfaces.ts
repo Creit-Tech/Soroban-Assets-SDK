@@ -1,4 +1,5 @@
-import { Memo, Networks, SorobanRpc } from 'soroban-client';
+import { Memo, Networks } from '@stellar/stellar-sdk';
+import { Api } from '@stellar/stellar-sdk/lib/soroban';
 
 export type u32 = number;
 export type i128 = bigint;
@@ -70,5 +71,5 @@ export type DefaultRequestParams<T> = T & {
 export interface DefaultContractTransactionGenerationResponse {
   transactionXDR: string;
   preparedTransactionXDR: string;
-  simulated: SorobanRpc.SimulateTransactionSuccessResponse;
+  simulated: Api.SimulateTransactionSuccessResponse;
 }

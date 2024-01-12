@@ -10,7 +10,6 @@ import {
 import {
   Account,
   Address,
-  assembleTransaction,
   Asset,
   Contract,
   hash,
@@ -20,16 +19,14 @@ import {
   Operation,
   scValToBigInt,
   scValToNative,
-  Server,
-  SorobanDataBuilder,
-  SorobanRpc,
   StrKey,
   Transaction,
   TransactionBuilder,
   xdr,
-} from 'soroban-client';
+} from '@stellar/stellar-sdk';
+import { assembleTransaction, Server, Api } from '@stellar/stellar-sdk/lib/soroban';
 import { prepareSorobanAssetTransaction } from './utils';
-import isSimulationError = SorobanRpc.isSimulationError;
+import isSimulationError = Api.isSimulationError;
 
 export class SorobanAssetsSDK {
   constructor(private readonly globalParams: SorobanAssetsSDKParams) {}
@@ -77,7 +74,7 @@ export class SorobanAssetsSDK {
           func: xdr.HostFunction.hostFunctionTypeCreateContract(
             new xdr.CreateContractArgs({
               contractIdPreimage: xdr.ContractIdPreimage.contractIdPreimageFromAsset(params.asset.toXDRObject()),
-              executable: xdr.ContractExecutable.contractExecutableToken(),
+              executable: xdr.ContractExecutable.contractExecutableStellarAsset(),
             })
           ),
           auth: [],
@@ -91,7 +88,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    const prepared = assembleTransaction(tx, params.network, simulated).build();
+    const prepared = assembleTransaction(tx, simulated).build();
 
     return {
       contractId: SorobanAssetsSDK.generateStellarAssetContractId(params),
@@ -122,7 +119,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToBigInt((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
+    return scValToBigInt((simulated.result as Api.SimulateHostFunctionResult).retval);
   }
 
   async approve(
@@ -167,25 +164,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToBigInt((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
-  }
-
-  async getSpendableBalance(account: address): Promise<i128> {
-    const tx = new TransactionBuilder(new Account(this.globalParams.simulationAccount, '0'), {
-      fee: this.globalParams.defaultFee,
-      networkPassphrase: this.globalParams.network,
-    })
-      .addOperation(this.contract.call(SorobanAssetMethods.spendable_balance, new Address(account).toScVal()))
-      .setTimeout(0)
-      .build();
-
-    const simulated = await this.server.simulateTransaction(tx);
-
-    if (isSimulationError(simulated)) {
-      throw new Error(simulated.error);
-    }
-
-    return scValToBigInt((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
+    return scValToBigInt((simulated.result as Api.SimulateHostFunctionResult).retval);
   }
 
   async transfer(
@@ -303,7 +282,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToNative((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
+    return scValToNative((simulated.result as Api.SimulateHostFunctionResult).retval);
   }
 
   async getAssetName(): Promise<string> {
@@ -321,7 +300,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToNative((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
+    return scValToNative((simulated.result as Api.SimulateHostFunctionResult).retval);
   }
 
   async getAssetSymbol(): Promise<string> {
@@ -339,7 +318,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToNative((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval).replace(/[^a-z0-9]/gi, '');
+    return scValToNative((simulated.result as Api.SimulateHostFunctionResult).retval).replace(/[^a-z0-9]/gi, '');
   }
 
   // TODO: Needs to be tested
@@ -378,7 +357,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToNative((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
+    return scValToNative((simulated.result as Api.SimulateHostFunctionResult).retval);
   }
 
   // TODO: Needs to be tested
@@ -418,7 +397,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    return scValToNative((simulated.result as SorobanRpc.SimulateHostFunctionResult).retval);
+    return scValToNative((simulated.result as Api.SimulateHostFunctionResult).retval);
   }
 
   async mint(
@@ -475,6 +454,7 @@ export class SorobanAssetsSDK {
     );
 
     const txData: xdr.SorobanTransactionData = new xdr.SorobanTransactionData({
+      resourceFee: xdr.Int64.fromString('0'),
       resources: new xdr.SorobanResources({
         footprint: new xdr.LedgerFootprint({
           readOnly: [instanceLedgerKey],
@@ -484,7 +464,6 @@ export class SorobanAssetsSDK {
         readBytes: 0,
         writeBytes: 0,
       }),
-      refundableFee: xdr.Int64.fromString('0'),
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       ext: new xdr.ExtensionPoint(0),
@@ -497,7 +476,7 @@ export class SorobanAssetsSDK {
       memo: params.memo,
     })
       .setTimeout(params.timeout || 0)
-      .addOperation(Operation.bumpFootprintExpiration({ ledgersToExpire: params.ledgersToExpire }))
+      .addOperation(Operation.extendFootprintTtl({ extendTo: params.ledgersToExpire }))
       .setSorobanData(txData)
       .build();
 
@@ -507,7 +486,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    const prepared = assembleTransaction(tx, this.globalParams.network, simulated).build();
+    const prepared = assembleTransaction(tx, simulated).build();
 
     return { transactionXDR: tx.toXDR(), simulated, preparedTransactionXDR: prepared.toXDR() };
   }
@@ -524,7 +503,7 @@ export class SorobanAssetsSDK {
       })
     );
 
-    const response2: SorobanRpc.GetLedgerEntriesResponse = await this.server.getLedgerEntries(instanceKey);
+    const response2: Api.GetLedgerEntriesResponse = await this.server.getLedgerEntries(instanceKey);
     const dataEntry: xdr.ContractDataEntry = response2.entries[0].val.contractData();
 
     const instance: xdr.ScContractInstance = dataEntry.val().instance();
@@ -540,6 +519,7 @@ export class SorobanAssetsSDK {
     );
 
     const txData = new xdr.SorobanTransactionData({
+      resourceFee: xdr.Int64.fromString('0'),
       resources: new xdr.SorobanResources({
         footprint: new xdr.LedgerFootprint({
           readOnly: [ledgerKey],
@@ -549,7 +529,6 @@ export class SorobanAssetsSDK {
         readBytes: 0,
         writeBytes: 0,
       }),
-      refundableFee: xdr.Int64.fromString('0'),
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       ext: new xdr.ExtensionPoint(0),
@@ -562,7 +541,7 @@ export class SorobanAssetsSDK {
       memo: params.memo,
     })
       .setTimeout(params.timeout || 0)
-      .addOperation(Operation.bumpFootprintExpiration({ ledgersToExpire: params.ledgersToExpire }))
+      .addOperation(Operation.extendFootprintTtl({ extendTo: params.ledgersToExpire }))
       .setSorobanData(txData)
       .build();
 
@@ -572,7 +551,7 @@ export class SorobanAssetsSDK {
       throw new Error(simulated.error);
     }
 
-    const prepared = assembleTransaction(tx, this.globalParams.network, simulated).build();
+    const prepared = assembleTransaction(tx, simulated).build();
 
     return { transactionXDR: tx.toXDR(), simulated, preparedTransactionXDR: prepared.toXDR() };
   }

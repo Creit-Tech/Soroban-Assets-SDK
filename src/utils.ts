@@ -1,16 +1,7 @@
 import { DefaultContractTransactionGenerationResponse, SorobanAssetMethods } from './interfaces';
-import {
-  Account,
-  assembleTransaction,
-  Contract,
-  Memo,
-  Networks,
-  Server,
-  SorobanRpc,
-  TransactionBuilder,
-  xdr,
-} from 'soroban-client';
-import isSimulationError = SorobanRpc.isSimulationError;
+import { Account, Contract, Memo, Networks, TransactionBuilder, xdr } from '@stellar/stellar-sdk';
+import { assembleTransaction, Server, Api } from '@stellar/stellar-sdk/lib/soroban';
+import isSimulationError = Api.isSimulationError;
 
 export async function prepareSorobanAssetTransaction(params: {
   sourceAccount: Account;
@@ -38,7 +29,7 @@ export async function prepareSorobanAssetTransaction(params: {
     throw new Error(simulated.error);
   }
 
-  const prepared = assembleTransaction(tx, params.networkPassphrase, simulated).build();
+  const prepared = assembleTransaction(tx, simulated).build();
 
   return { transactionXDR: tx.toXDR(), simulated, preparedTransactionXDR: prepared.toXDR() };
 }
