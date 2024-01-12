@@ -7,12 +7,8 @@ A Javascript/Typescript small SDK to interact with Soroban Assets.
 ## Installation
 
 ```shell
-npm i --save github:Creit-Tech/Soroban-Assets-SDK
+npm i @creit.tech/soroban-assets-sdk
 ```
-
-Install the latest version available in our repo, we use Github instead of NPM because this way you can check the code before installing it which in our view is safer.
-
-> We recommend you using version tags when installing the library, this way you have control when doing an `npm i`
 
 ## How to use it
 
