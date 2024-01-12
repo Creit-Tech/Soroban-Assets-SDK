@@ -1,4 +1,4 @@
-[soroban-assets-sdk-js](../README.md) / [Exports](../modules.md) / BalanceValue
+[@creit-tech/soroban-assets-sdk](../README.md) / [Exports](../modules.md) / BalanceValue
 
 # Interface: BalanceValue
 
@@ -18,7 +18,7 @@
 
 #### Defined in
 
-[interfaces.ts:18](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L18)
+[interfaces.ts:19](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L19)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:19](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L19)
+[interfaces.ts:20](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L20)
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 #### Defined in
 
-[interfaces.ts:20](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L20)
+[interfaces.ts:21](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L21)

@@ -1,4 +1,4 @@
-[soroban-assets-sdk-js](../README.md) / [Exports](../modules.md) / DefaultContractTransactionGenerationResponse
+[@creit-tech/soroban-assets-sdk](../README.md) / [Exports](../modules.md) / DefaultContractTransactionGenerationResponse
 
 # Interface: DefaultContractTransactionGenerationResponse
 
@@ -18,7 +18,7 @@
 
 #### Defined in
 
-[interfaces.ts:72](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L72)
+[interfaces.ts:73](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L73)
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 #### Defined in
 
-[interfaces.ts:73](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L73)
+[interfaces.ts:74](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L74)
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 #### Defined in
 
-[interfaces.ts:71](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L71)
+[interfaces.ts:72](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L72)

@@ -1,4 +1,4 @@
-soroban-assets-sdk-js / [Exports](modules.md)
+@creit-tech/soroban-assets-sdk / [Exports](modules.md)
 
 # Soroban Assets SDK
 

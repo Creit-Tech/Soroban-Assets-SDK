@@ -1,4 +1,4 @@
-[soroban-assets-sdk-js](../README.md) / [Exports](../modules.md) / AllowanceValue
+[@creit-tech/soroban-assets-sdk](../README.md) / [Exports](../modules.md) / AllowanceValue
 
 # Interface: AllowanceValue
 
@@ -17,7 +17,7 @@
 
 #### Defined in
 
-[interfaces.ts:13](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L13)
+[interfaces.ts:14](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L14)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 #### Defined in
 
-[interfaces.ts:14](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L14)
+[interfaces.ts:15](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L15)

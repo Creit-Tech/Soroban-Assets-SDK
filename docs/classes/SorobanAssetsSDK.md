@@ -1,4 +1,4 @@
-[soroban-assets-sdk-js](../README.md) / [Exports](../modules.md) / SorobanAssetsSDK
+[@creit-tech/soroban-assets-sdk](../README.md) / [Exports](../modules.md) / SorobanAssetsSDK
 
 # Class: SorobanAssetsSDK
 
@@ -32,7 +32,6 @@
 - [getAssetName](SorobanAssetsSDK.md#getassetname)
 - [getAssetSymbol](SorobanAssetsSDK.md#getassetsymbol)
 - [getBalance](SorobanAssetsSDK.md#getbalance)
-- [getSpendableBalance](SorobanAssetsSDK.md#getspendablebalance)
 - [mint](SorobanAssetsSDK.md#mint)
 - [setAdmin](SorobanAssetsSDK.md#setadmin)
 - [setAuthorized](SorobanAssetsSDK.md#setauthorized)
@@ -55,7 +54,7 @@
 
 #### Defined in
 
-[sdk.ts:35](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L35)
+[sdk.ts:32](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L32)
 
 ## Properties
 
@@ -65,7 +64,7 @@
 
 #### Defined in
 
-[sdk.ts:35](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L35)
+[sdk.ts:32](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L32)
 
 ## Accessors
 
@@ -79,7 +78,7 @@
 
 #### Defined in
 
-[sdk.ts:37](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L37)
+[sdk.ts:34](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L34)
 
 ___
 
@@ -93,7 +92,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:41](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L41)
+[sdk.ts:38](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L38)
 
 ## Methods
 
@@ -113,7 +112,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:128](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L128)
+[sdk.ts:125](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L125)
 
 ___
 
@@ -133,7 +132,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:516](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L516)
+[sdk.ts:495](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L495)
 
 ___
 
@@ -153,7 +152,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:464](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L464)
+[sdk.ts:443](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L443)
 
 ___
 
@@ -173,7 +172,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:243](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L243)
+[sdk.ts:222](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L222)
 
 ___
 
@@ -193,7 +192,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:266](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L266)
+[sdk.ts:245](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L245)
 
 ___
 
@@ -213,7 +212,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:406](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L406)
+[sdk.ts:385](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L385)
 
 ___
 
@@ -233,7 +232,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:444](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L444)
+[sdk.ts:423](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L423)
 
 ___
 
@@ -247,7 +246,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:366](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L366)
+[sdk.ts:345](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L345)
 
 ___
 
@@ -269,7 +268,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:104](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L104)
+[sdk.ts:101](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L101)
 
 ___
 
@@ -283,7 +282,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:291](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L291)
+[sdk.ts:270](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L270)
 
 ___
 
@@ -297,7 +296,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:309](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L309)
+[sdk.ts:288](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L288)
 
 ___
 
@@ -311,7 +310,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:327](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L327)
+[sdk.ts:306](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L306)
 
 ___
 
@@ -331,27 +330,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:155](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L155)
-
-___
-
-### getSpendableBalance
-
-▸ **getSpendableBalance**(`account`): `Promise`<`bigint`\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `account` | `string` |
-
-#### Returns
-
-`Promise`<`bigint`\>
-
-#### Defined in
-
-[sdk.ts:173](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L173)
+[sdk.ts:152](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L152)
 
 ___
 
@@ -371,7 +350,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:424](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L424)
+[sdk.ts:403](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L403)
 
 ___
 
@@ -391,7 +370,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:346](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L346)
+[sdk.ts:325](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L325)
 
 ___
 
@@ -411,7 +390,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:385](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L385)
+[sdk.ts:364](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L364)
 
 ___
 
@@ -431,7 +410,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:191](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L191)
+[sdk.ts:170](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L170)
 
 ___
 
@@ -451,7 +430,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:216](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L216)
+[sdk.ts:195](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L195)
 
 ___
 
@@ -473,7 +452,7 @@ ___
 
 #### Defined in
 
-[sdk.ts:45](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L45)
+[sdk.ts:42](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L42)
 
 ___
 
@@ -501,4 +480,4 @@ ___
 
 #### Defined in
 
-[sdk.ts:56](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/sdk.ts#L56)
+[sdk.ts:53](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/sdk.ts#L53)

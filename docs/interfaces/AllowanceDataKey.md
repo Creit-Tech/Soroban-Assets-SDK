@@ -1,4 +1,4 @@
-[soroban-assets-sdk-js](../README.md) / [Exports](../modules.md) / AllowanceDataKey
+[@creit-tech/soroban-assets-sdk](../README.md) / [Exports](../modules.md) / AllowanceDataKey
 
 # Interface: AllowanceDataKey
 
@@ -17,7 +17,7 @@
 
 #### Defined in
 
-[interfaces.ts:8](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L8)
+[interfaces.ts:9](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L9)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 #### Defined in
 
-[interfaces.ts:9](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/b2aa3b4/src/interfaces.ts#L9)
+[interfaces.ts:10](https://github.com/Creit-Tech/Soroban-Assets-SDK/blob/8a9b06f/src/interfaces.ts#L10)
