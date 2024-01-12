@@ -1,6 +1,6 @@
 {
   "name": "@creit.tech/soroban-assets-sdk",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A JS package for interacting with Soroban assets contracts easily",
   "main": "lib/index",
   "types": "lib/index",
