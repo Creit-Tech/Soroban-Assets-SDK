@@ -15,11 +15,9 @@ jobs:
           node-version: '18.16.0'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm ci
+      - run: npm -g i pnpm && pnpm i
 
-      - run: npm i --no-save @stellar/stellar-sdk@11.2.0
-
-      - run: npm run build
+      - run: pnpm run build
 
       - run: npm publish
         env:

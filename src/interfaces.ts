@@ -1,4 +1,4 @@
-import { Memo, Networks } from '@stellar/stellar-sdk';
+import { Memo, Networks, SorobanRpc } from '@stellar/stellar-sdk';
 import { Api } from '@stellar/stellar-sdk/lib/soroban';
 
 export type u32 = number;
@@ -57,8 +57,7 @@ export interface SorobanAssetsSDKParams {
   simulationAccount: address;
   contractId: address;
   defaultFee: string;
-  rpcUrl: string;
-  allowHttp?: boolean;
+  rpc: SorobanRpc.Server;
   network: Networks;
 }
 

@@ -12,14 +12,13 @@ import {
   Address,
   Asset,
   Contract,
-  hash,
   Memo,
   nativeToScVal,
   Networks,
   Operation,
   scValToBigInt,
   scValToNative,
-  StrKey,
+  SorobanRpc,
   Transaction,
   TransactionBuilder,
   xdr,
@@ -36,32 +35,19 @@ export class SorobanAssetsSDK {
   }
 
   get server(): Server {
-    return new Server(this.globalParams.rpcUrl, { allowHttp: !!this.globalParams.allowHttp });
-  }
-
-  public static generateStellarAssetContractId(params: { asset: Asset; network: Networks }): address {
-    const contractIdPreimage: xdr.HashIdPreimage = xdr.HashIdPreimage.envelopeTypeContractId(
-      new xdr.HashIdPreimageContractId({
-        networkId: hash(Buffer.from(params.network)),
-        contractIdPreimage: xdr.ContractIdPreimage.contractIdPreimageFromAsset(params.asset.toXDRObject()),
-      })
-    );
-
-    return StrKey.encodeContract(hash(contractIdPreimage.toXDR()));
+    return this.globalParams.rpc;
   }
 
   public static async wrapAsset(params: {
     sourceAccount: string;
     asset: Asset;
-    rpcUrl: string;
+    rpc: SorobanRpc.Server;
     network: Networks;
     timeout?: number;
     memo?: Memo;
     defaultFee?: string;
-    allowHttp?: boolean;
   }): Promise<DefaultContractTransactionGenerationResponse & { contractId: address }> {
-    const server = new Server(params.rpcUrl, { allowHttp: !!params.allowHttp });
-    const account = await server.getAccount(params.sourceAccount);
+    const account = await params.rpc.getAccount(params.sourceAccount);
 
     const tx = new TransactionBuilder(account, {
       fee: params.defaultFee || '1000000',
@@ -82,7 +68,7 @@ export class SorobanAssetsSDK {
       )
       .build();
 
-    const simulated = await server.simulateTransaction(tx);
+    const simulated = await params.rpc.simulateTransaction(tx);
 
     if (isSimulationError(simulated)) {
       throw new Error(simulated.error);
@@ -91,7 +77,7 @@ export class SorobanAssetsSDK {
     const prepared = assembleTransaction(tx, simulated).build();
 
     return {
-      contractId: SorobanAssetsSDK.generateStellarAssetContractId(params),
+      contractId: params.asset.contractId(params.network),
       preparedTransactionXDR: prepared.toXDR(),
       transactionXDR: tx.toXDR(),
       simulated,

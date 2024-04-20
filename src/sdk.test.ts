@@ -8,6 +8,7 @@ import {
   Keypair,
   Networks,
   Operation,
+  SorobanRpc,
   Transaction,
   TransactionBuilder,
   xdr,
@@ -71,30 +72,27 @@ describe('SorobanAssetsSDK Tests', () => {
   const assetSDK: SorobanAssetsSDK = new SorobanAssetsSDK({
     contractId: SorobanAssetsSDK.generateStellarAssetContractId({ asset, network }),
     simulationAccount: simulationAccountKeypair.publicKey(),
-    allowHttp: true,
-    rpcUrl: rpcUrl,
     defaultFee,
     network,
+    rpc,
   });
 
   const nativeAsset: SorobanAssetsSDK = new SorobanAssetsSDK({
     contractId: SorobanAssetsSDK.generateStellarAssetContractId({ asset: Asset.native(), network }),
     simulationAccount: simulationAccountKeypair.publicKey(),
-    allowHttp: true,
     defaultFee,
     network,
-    rpcUrl,
+    rpc,
   });
 
   beforeAll(async () => {
     const assetIssuer: Account = await rpc.requestAirdrop(assetIssuerKeypair.publicKey());
     const { preparedTransactionXDR } = await SorobanAssetsSDK.wrapAsset({
       sourceAccount: assetIssuerKeypair.publicKey(),
-      allowHttp: true,
       defaultFee,
       network,
-      rpcUrl,
       asset,
+      rpc,
     });
 
     const tx = new Transaction(preparedTransactionXDR, network);
@@ -363,8 +361,7 @@ describe('SorobanAssetsSDK Tests', () => {
       const assetCode: string = randomBytes(4).toString('hex').toUpperCase();
 
       const { preparedTransactionXDR, contractId } = await SorobanAssetsSDK.wrapAsset({
-        rpcUrl,
-        allowHttp: true,
+        rpc,
         network,
         sourceAccount: keypair.publicKey(),
         asset: new Asset(assetCode, keypair.publicKey()),
@@ -378,8 +375,7 @@ describe('SorobanAssetsSDK Tests', () => {
 
       const asset: SorobanAssetsSDK = new SorobanAssetsSDK({
         contractId,
-        rpcUrl: rpcUrl,
-        allowHttp: true,
+        rpc,
         defaultFee,
         network,
         simulationAccount: keypair.publicKey(),

@@ -13,14 +13,14 @@ npm i @creit.tech/soroban-assets-sdk
 ## How to use it
 
 The most important part of the library is the class `SorobanAssetsSDK`, we create a new instance for each asset we are interacting with like this:
+
 ```typescript
 const assetSDK: SorobanAssetsSDK = new SorobanAssetsSDK({
-    contractId: SorobanAssetsSDK.generateStellarAssetContractId({ asset: Asset.native(), network: Networks.STANDALONE }),
-    simulationAccount: simulationAccountKeypair.publicKey(),
-    allowHttp: true,
-    defaultFee: '100000',
-    network: Networks.STANDALONE,
-    rpcUrl: 'http://localhost:8000/soroban/rpc',
+  contractId: SorobanAssetsSDK.generateStellarAssetContractId({ asset: Asset.native(), network: Networks.STANDALONE }),
+  simulationAccount: simulationAccountKeypair.publicKey(),
+  defaultFee: '100000',
+  network: Networks.STANDALONE,
+  rpcUrl: new SorobanRpc.Server('http://localhost:8000/soroban/rpc'),
 });
 ```
 
