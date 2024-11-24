@@ -8,7 +8,7 @@ import {
   u32,
 } from './interfaces';
 import { prepareSorobanAssetTransaction } from './utils';
-import { Account, Asset, Contract, Memo, Networks, rpc, Transaction, xdr } from '@stellar/stellar-sdk';
+import { Account, Asset, Contract, Memo, Networks, rpc, xdr } from '@stellar/stellar-sdk';
 
 export class SorobanAssetsSDK {
   constructor(public globalParams: SorobanAssetsSDKParams) {}

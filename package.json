@@ -1,15 +1,9 @@
 {
   "name": "@creit.tech/soroban-assets-sdk",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A JS package for interacting with Soroban assets contracts easily",
-  "main": "lib/index",
-  "types": "lib/index",
-  "files": [
-    "lib",
-    "LICENSE",
-    "README.md",
-    "package.json"
-  ],
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "npx tsc -p .",
     "build:docs": "npx typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
