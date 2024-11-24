@@ -1,5 +1,17 @@
-import { Memo, Networks, SorobanRpc } from '@stellar/stellar-sdk';
-import { Api } from '@stellar/stellar-sdk/lib/soroban';
+import {
+  Account,
+  Address,
+  Contract,
+  Memo,
+  nativeToScVal,
+  Networks,
+  Operation,
+  scValToBigInt,
+  scValToNative,
+  rpc,
+  TransactionBuilder,
+  xdr,
+} from '@stellar/stellar-sdk';
 
 export type u32 = number;
 export type i128 = bigint;
@@ -51,13 +63,31 @@ export enum SorobanAssetMethods {
 
 export interface SorobanAssetsSDKParams {
   /**
+   * These are all from the Stellar SDK, import them and pass them to the object.
+   * This is done this way because the `@stellar/stellar-sdk` package and its dependencies rely a lot on `instance of` logic,
+   * that means that we need to use the same objects everytime we can so we avoid issues in those conditions.
+   */
+  stellarSDK: {
+    Account: typeof Account;
+    Address: typeof Address;
+    Contract: typeof Contract;
+    xdr: typeof xdr;
+    TransactionBuilder: typeof TransactionBuilder;
+    rpc: typeof rpc;
+    nativeToScVal: typeof nativeToScVal;
+    scValToNative: typeof scValToNative;
+    scValToBigInt: typeof scValToBigInt;
+    Operation: typeof Operation;
+  };
+
+  /**
    * The simulation account is the one used for pure view (read-only) methods like `balance`, `symbol`, etc
    * You don't need to own this account, but it must be an existing account on the network
    */
   simulationAccount: address;
   contractId: address;
   defaultFee: string;
-  rpc: SorobanRpc.Server;
+  rpc: rpc.Server;
   network: Networks;
 }
 
@@ -70,5 +100,5 @@ export type DefaultRequestParams<T> = T & {
 export interface DefaultContractTransactionGenerationResponse {
   transactionXDR: string;
   preparedTransactionXDR: string;
-  simulated: Api.SimulateTransactionSuccessResponse;
+  simulated: rpc.Api.SimulateTransactionSuccessResponse;
 }

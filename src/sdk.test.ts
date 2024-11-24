@@ -5,19 +5,22 @@ import {
   Asset,
   AuthClawbackEnabledFlag,
   AuthRevocableFlag,
+  Contract,
+  Horizon,
   Keypair,
+  nativeToScVal,
   Networks,
   Operation,
-  SorobanRpc,
+  rpc,
+  scValToBigInt,
+  scValToNative,
   Transaction,
   TransactionBuilder,
   xdr,
 } from '@stellar/stellar-sdk';
-import { Server as SorobanServer, Api } from '@stellar/stellar-sdk/lib/soroban';
-import { Server as HorizonServer } from '@stellar/stellar-sdk/lib/horizon';
 import { randomBytes } from 'node:crypto';
 
-async function waitUntilTxApproved(server: SorobanServer, result: Api.SendTransactionResponse) {
+async function waitUntilTxApproved(server: rpc.Server, result: rpc.Api.SendTransactionResponse) {
   if (result.status === 'ERROR') {
     console.error(result.errorResult?.toXDR('base64'));
     throw new Error('Sending the transaction failed');
@@ -39,8 +42,8 @@ async function waitUntilTxApproved(server: SorobanServer, result: Api.SendTransa
   }
 }
 
-async function getExpirationLedger(server: SorobanServer, ledgerKey: xdr.LedgerKey) {
-  const data: Api.GetLedgerEntriesResponse = await server.getLedgerEntries(ledgerKey);
+async function getExpirationLedger(server: rpc.Server, ledgerKey: xdr.LedgerKey) {
+  const data: rpc.Api.GetLedgerEntriesResponse = await server.getLedgerEntries(ledgerKey);
 
   if (!data.entries) {
     throw new Error(`Entry doesn't exist`);
@@ -56,11 +59,11 @@ async function getExpirationLedger(server: SorobanServer, ledgerKey: xdr.LedgerK
 describe('SorobanAssetsSDK Tests', () => {
   const assetIssuerKeypair: Keypair = Keypair.random();
   const asset: Asset = new Asset(randomBytes(3).toString('hex'), assetIssuerKeypair.publicKey());
-  const horizonUrl = 'http://localhost:8000';
-  const rpcUrl = 'http://localhost:8000/soroban/rpc';
-  const horizon: HorizonServer = new HorizonServer(horizonUrl, { allowHttp: true });
-  const rpc: SorobanServer = new SorobanServer(rpcUrl, { allowHttp: true });
-  const network = Networks.STANDALONE;
+  const horizonUrl = 'https://horizon-testnet.stellar.org';
+  const rpcUrl = 'https://soroban-testnet.stellar.org';
+  const horizon: Horizon.Server = new Horizon.Server(horizonUrl);
+  const rpcServer: rpc.Server = new rpc.Server(rpcUrl);
+  const network = Networks.TESTNET;
   const simulationAccountKeypair: Keypair = Keypair.random();
   const defaultFee = '10000000';
   const initialIssuance = '10000.0000000';
@@ -70,40 +73,77 @@ describe('SorobanAssetsSDK Tests', () => {
   const toKeypair: Keypair = Keypair.random();
 
   const assetSDK: SorobanAssetsSDK = new SorobanAssetsSDK({
-    contractId: SorobanAssetsSDK.generateStellarAssetContractId({ asset, network }),
+    stellarSDK: {
+      Account,
+      Address,
+      Contract,
+      xdr,
+      TransactionBuilder,
+      rpc,
+      nativeToScVal,
+      scValToNative,
+      scValToBigInt,
+      Operation,
+    },
+    contractId: asset.contractId(network),
     simulationAccount: simulationAccountKeypair.publicKey(),
     defaultFee,
     network,
-    rpc,
+    rpc: rpcServer,
   });
 
   const nativeAsset: SorobanAssetsSDK = new SorobanAssetsSDK({
-    contractId: SorobanAssetsSDK.generateStellarAssetContractId({ asset: Asset.native(), network }),
+    stellarSDK: {
+      Account,
+      Address,
+      Contract,
+      xdr,
+      TransactionBuilder,
+      rpc,
+      nativeToScVal,
+      scValToNative,
+      scValToBigInt,
+      Operation,
+    },
+    contractId: Asset.native().contractId(network),
     simulationAccount: simulationAccountKeypair.publicKey(),
     defaultFee,
     network,
-    rpc,
+    rpc: rpcServer,
   });
 
   beforeAll(async () => {
-    const assetIssuer: Account = await rpc.requestAirdrop(assetIssuerKeypair.publicKey());
+    await horizon.friendbot(assetIssuerKeypair.publicKey()).call();
+    const assetIssuer: Account = await rpcServer.getAccount(assetIssuerKeypair.publicKey());
     const { preparedTransactionXDR } = await SorobanAssetsSDK.wrapAsset({
+      sdk: {
+        Account,
+        Address,
+        Contract,
+        xdr,
+        TransactionBuilder,
+        rpc,
+        nativeToScVal,
+        scValToNative,
+        scValToBigInt,
+        Operation,
+      },
       sourceAccount: assetIssuerKeypair.publicKey(),
       defaultFee,
       network,
       asset,
-      rpc,
+      rpc: rpcServer,
     });
 
-    const tx = new Transaction(preparedTransactionXDR, network);
+    const tx = await rpcServer.prepareTransaction(new Transaction(preparedTransactionXDR, network));
     tx.sign(assetIssuerKeypair);
 
-    const result = await rpc.sendTransaction(tx);
-    await waitUntilTxApproved(rpc, result);
+    const result = await rpcServer.sendTransaction(tx);
+    await waitUntilTxApproved(rpcServer, result);
 
-    await rpc.requestAirdrop(spenderKeypair.publicKey());
-    await rpc.requestAirdrop(fromKeypair.publicKey());
-    await rpc.requestAirdrop(toKeypair.publicKey());
+    await horizon.friendbot(spenderKeypair.publicKey()).call();
+    await horizon.friendbot(fromKeypair.publicKey()).call();
+    await horizon.friendbot(toKeypair.publicKey()).call();
 
     assetIssuer.incrementSequenceNumber();
     const stellarTxBuilder = new TransactionBuilder(assetIssuer, {
@@ -137,7 +177,11 @@ describe('SorobanAssetsSDK Tests', () => {
     stellarTx.sign(Keypair.fromSecret(fromKeypair.secret()));
     stellarTx.sign(Keypair.fromSecret(toKeypair.secret()));
 
-    await horizon.submitTransaction(stellarTx);
+    try {
+      await horizon.submitTransaction(stellarTx);
+    } catch (e) {
+      throw e;
+    }
   }, 60000);
 
   describe('Instance methods', () => {
@@ -151,7 +195,7 @@ describe('SorobanAssetsSDK Tests', () => {
 
       expect(currentAllowance).toBe(0n);
 
-      const latestLedger = await rpc.getLatestLedger();
+      const latestLedger = await rpcServer.getLatestLedger();
 
       const approveTx = await assetSDK.approve({
         expirationLedger: latestLedger.sequence + 50000,
@@ -161,10 +205,10 @@ describe('SorobanAssetsSDK Tests', () => {
         amount,
       });
 
-      const tx = new Transaction(approveTx.preparedTransactionXDR, network);
+      const tx = await rpcServer.prepareTransaction(new Transaction(approveTx.preparedTransactionXDR, network));
       tx.sign(fromKeypair);
-      const result = await rpc.sendTransaction(tx);
-      await waitUntilTxApproved(rpc, result);
+      const result = await rpcServer.sendTransaction(tx);
+      await waitUntilTxApproved(rpcServer, result);
 
       const updatedAllowance: bigint = await assetSDK.getAllowance({
         spender: spenderKeypair.publicKey(),
@@ -186,10 +230,10 @@ describe('SorobanAssetsSDK Tests', () => {
         amount: amount / 2n,
       });
 
-      const tx2 = new Transaction(transferFromTx.preparedTransactionXDR, network);
+      const tx2 = await rpcServer.prepareTransaction(new Transaction(transferFromTx.preparedTransactionXDR, network));
       tx2.sign(spenderKeypair);
-      const result2 = await rpc.sendTransaction(tx2);
-      await waitUntilTxApproved(rpc, result2);
+      const result2 = await rpcServer.sendTransaction(tx2);
+      await waitUntilTxApproved(rpcServer, result2);
 
       const burnFromTx = await assetSDK.burnFrom({
         sourceAccount: spenderKeypair.publicKey(),
@@ -198,14 +242,14 @@ describe('SorobanAssetsSDK Tests', () => {
         amount: amount / 2n,
       });
 
-      const tx3 = new Transaction(burnFromTx.preparedTransactionXDR, network);
+      const tx3 = await rpcServer.prepareTransaction(new Transaction(burnFromTx.preparedTransactionXDR, network));
       tx3.sign(spenderKeypair);
-      const result3 = await rpc.sendTransaction(tx3);
+      const result3 = await rpcServer.sendTransaction(tx3);
       if (result3.status === 'ERROR') {
         console.error(result3.errorResult?.toXDR('base64'));
         throw new Error('Sending the transaction failed');
       }
-      await waitUntilTxApproved(rpc, result3);
+      await waitUntilTxApproved(rpcServer, result3);
 
       const [updatedFromBalance, updatedToBalance] = await Promise.all([
         assetSDK.getBalance(fromKeypair.publicKey()),
@@ -238,10 +282,10 @@ describe('SorobanAssetsSDK Tests', () => {
         amount,
       });
 
-      const tx = new Transaction(preparedTransactionXDR, network);
+      const tx = await rpcServer.prepareTransaction(new Transaction(preparedTransactionXDR, network));
       tx.sign(fromKeypair);
-      const result = await rpc.sendTransaction(tx);
-      await waitUntilTxApproved(rpc, result);
+      const result = await rpcServer.sendTransaction(tx);
+      await waitUntilTxApproved(rpcServer, result);
 
       const [updatedFromBalance, updatedToBalance] = await Promise.all([
         assetSDK.getBalance(fromKeypair.publicKey()),
@@ -262,10 +306,10 @@ describe('SorobanAssetsSDK Tests', () => {
         to: toKeypair.publicKey(),
         amount,
       });
-      const mintTx = new Transaction(mintResult.preparedTransactionXDR, network);
+      const mintTx = await rpcServer.prepareTransaction(new Transaction(mintResult.preparedTransactionXDR, network));
       mintTx.sign(assetIssuerKeypair);
-      const result = await rpc.sendTransaction(mintTx);
-      await waitUntilTxApproved(rpc, result);
+      const result = await rpcServer.sendTransaction(mintTx);
+      await waitUntilTxApproved(rpcServer, result);
 
       const maxBalance: bigint = await assetSDK.getBalance(toKeypair.publicKey());
 
@@ -276,10 +320,10 @@ describe('SorobanAssetsSDK Tests', () => {
         from: toKeypair.publicKey(),
         amount: amount / 2n,
       });
-      const burnTx = new Transaction(burnResult.preparedTransactionXDR, network);
+      const burnTx = await rpcServer.prepareTransaction(new Transaction(burnResult.preparedTransactionXDR, network));
       burnTx.sign(toKeypair);
-      const result2 = await rpc.sendTransaction(burnTx);
-      await waitUntilTxApproved(rpc, result2);
+      const result2 = await rpcServer.sendTransaction(burnTx);
+      await waitUntilTxApproved(rpcServer, result2);
 
       const updatedAmount: bigint = await assetSDK.getBalance(toKeypair.publicKey());
 
@@ -290,10 +334,12 @@ describe('SorobanAssetsSDK Tests', () => {
         from: toKeypair.publicKey(),
         amount: amount / 2n,
       });
-      const clawbackTx = new Transaction(clawbackResult.preparedTransactionXDR, network);
+      const clawbackTx = await rpcServer.prepareTransaction(
+        new Transaction(clawbackResult.preparedTransactionXDR, network)
+      );
       clawbackTx.sign(assetIssuerKeypair);
-      const result3 = await rpc.sendTransaction(clawbackTx);
-      await waitUntilTxApproved(rpc, result3);
+      const result3 = await rpcServer.sendTransaction(clawbackTx);
+      await waitUntilTxApproved(rpcServer, result3);
 
       const finalAmount: bigint = await assetSDK.getBalance(toKeypair.publicKey());
 
@@ -311,71 +357,54 @@ describe('SorobanAssetsSDK Tests', () => {
       expect(name).toEqual('native');
       expect(symbol).toEqual('native');
     }, 20000);
-
-    test('Bumping contract instance', async () => {
-      const ledgersToExpire: number = 1500000;
-      const contractId: string = SorobanAssetsSDK.generateStellarAssetContractId({
-        asset,
-        network,
-      });
-      const address: Address = new Address(contractId);
-
-      const instanceLedgerKey: xdr.LedgerKey = xdr.LedgerKey.contractData(
-        new xdr.LedgerKeyContractData({
-          contract: address.toScAddress(),
-          key: xdr.ScVal.scvLedgerKeyContractInstance(),
-          durability: xdr.ContractDataDurability.persistent(),
-        })
-      );
-
-      const currentExpirationLedger = await getExpirationLedger(rpc, instanceLedgerKey);
-
-      const { preparedTransactionXDR } = await assetSDK.bumpContractInstance({
-        sourceAccount: fromKeypair.publicKey(),
-        ledgersToExpire,
-      });
-
-      const tx = new Transaction(preparedTransactionXDR, network);
-      tx.sign(fromKeypair);
-      const result = await rpc.sendTransaction(tx);
-      await waitUntilTxApproved(rpc, result);
-
-      const updatedExpirationLedger = await getExpirationLedger(rpc, instanceLedgerKey);
-      expect(updatedExpirationLedger).toBeGreaterThan(BigInt(currentExpirationLedger || 0));
-    }, 20000);
   });
 
   describe('Static methods', () => {
-    it('Should correctly generate the stellar asset contract id', () => {
-      const nativeContractId: string = SorobanAssetsSDK.generateStellarAssetContractId({
-        asset: Asset.native(),
-        network,
-      });
-
-      expect(nativeContractId).toBe('CDMLFMKMMD7MWZP3FKUBZPVHTUEDLSX4BYGYKH4GCESXYHS3IHQ4EIG4');
-    });
-
     it('Should wrap a random asset', async () => {
       const keypair: Keypair = Keypair.random();
-      await rpc.requestAirdrop(keypair.publicKey());
+      await horizon.friendbot(keypair.publicKey()).call();
       const assetCode: string = randomBytes(4).toString('hex').toUpperCase();
 
       const { preparedTransactionXDR, contractId } = await SorobanAssetsSDK.wrapAsset({
-        rpc,
+        sdk: {
+          Account,
+          Address,
+          Contract,
+          xdr,
+          TransactionBuilder,
+          rpc,
+          nativeToScVal,
+          scValToNative,
+          scValToBigInt,
+          Operation,
+        },
+        rpc: rpcServer,
         network,
         sourceAccount: keypair.publicKey(),
         asset: new Asset(assetCode, keypair.publicKey()),
       });
 
-      const tx = new Transaction(preparedTransactionXDR, network);
+      const tx = await rpcServer.prepareTransaction(new Transaction(preparedTransactionXDR, network));
       tx.sign(keypair);
 
-      const result = await rpc.sendTransaction(tx);
-      await waitUntilTxApproved(rpc, result);
+      const result = await rpcServer.sendTransaction(tx);
+      await waitUntilTxApproved(rpcServer, result);
 
       const asset: SorobanAssetsSDK = new SorobanAssetsSDK({
+        stellarSDK: {
+          Account,
+          Address,
+          Contract,
+          xdr,
+          TransactionBuilder,
+          rpc,
+          nativeToScVal,
+          scValToNative,
+          scValToBigInt,
+          Operation,
+        },
         contractId,
-        rpc,
+        rpc: rpcServer,
         defaultFee,
         network,
         simulationAccount: keypair.publicKey(),

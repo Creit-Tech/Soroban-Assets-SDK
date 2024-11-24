@@ -1,9 +1,12 @@
-import { DefaultContractTransactionGenerationResponse, SorobanAssetMethods } from './interfaces';
-import { Account, Contract, Memo, Networks, TransactionBuilder, xdr } from '@stellar/stellar-sdk';
-import { assembleTransaction, Server, Api } from '@stellar/stellar-sdk/lib/soroban';
-import isSimulationError = Api.isSimulationError;
+import {
+  DefaultContractTransactionGenerationResponse,
+  SorobanAssetMethods,
+  SorobanAssetsSDKParams,
+} from './interfaces';
+import { Account, Contract, Memo, Networks, rpc, xdr } from '@stellar/stellar-sdk';
 
 export async function prepareSorobanAssetTransaction(params: {
+  sdk: SorobanAssetsSDKParams['stellarSDK'];
   sourceAccount: Account;
   fee: string;
   networkPassphrase: Networks;
@@ -11,10 +14,10 @@ export async function prepareSorobanAssetTransaction(params: {
   memo?: Memo;
   contract: Contract;
   contractMethod: SorobanAssetMethods;
-  server: Server;
+  server: rpc.Server;
   scVals: xdr.ScVal[];
 }): Promise<DefaultContractTransactionGenerationResponse> {
-  const tx = new TransactionBuilder(params.sourceAccount, {
+  const tx = new params.sdk.TransactionBuilder(params.sourceAccount, {
     fee: params.fee,
     networkPassphrase: params.networkPassphrase,
     memo: params.memo,
@@ -25,11 +28,11 @@ export async function prepareSorobanAssetTransaction(params: {
 
   const simulated = await params.server.simulateTransaction(tx);
 
-  if (isSimulationError(simulated)) {
+  if (params.sdk.rpc.Api.isSimulationError(simulated)) {
     throw new Error(simulated.error);
   }
 
-  const prepared = assembleTransaction(tx, simulated).build();
+  const prepared = params.sdk.rpc.assembleTransaction(tx, simulated).build();
 
   return { transactionXDR: tx.toXDR(), simulated, preparedTransactionXDR: prepared.toXDR() };
 }
